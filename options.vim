@@ -1,0 +1,19 @@
+filetype plugin indent on
+set backspace=indent,eol,start
+set nocompatible
+syntax on 
+set number
+set relativenumber
+set encoding=utf-8
+set tabstop=4
+set shiftwidth=4
+set softtabstop=4
+set expandtab
+set autoindent
+set smartindent
+set hlsearch
+set incsearch
+set showmatch
+set background=dark
+set hidden
+set colorcolumn=100
