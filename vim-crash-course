@@ -1,0 +1,290 @@
+**NOTE**: Specific examples given for options, flags, commands variations, etc., are not comprehensive.
+
+# NORMAL MODE
+Vim has 2 main "modes", that chance the behavior of all your keys. The default mode of Vim is Normal Mode and is mostly used for moving the cursor and navigating the current file.
+
+Some important (or longer) commands begin with ":" and you will see the text you enter next at the bottom left of the screen.
+
+`:q[uit]` - quit (the current window of) Vim. ("Window" here is internal to Vim, not if you have multiple OS-level windows of Vim open at once.)  
+`:q!` - force quit (if the current buffer has been changed since the last save)  
+`:e[dit] {filename}` - read file {filename} into a new buffer.  
+Vim doesn't "open" files like MS Word does. Instead, it reads the contents of a file into RAM and then you edit the "buffer" in RAM. Other programs may access and change the underlying file you originally opened (Vim will notice this and issue a warning).
+`:w[rite] {filename}` - write the current buffer to {filename}. If no filename passed (i.e., `:w`) and the buffer already has an associated filename (the one used with `:e {filename}`, that associated filename will be used.  
+A simple `:w` is like MS Word "save" and `:w {new_filename}` is "save a copy as `{new_filename}` but keep the current buffer.  
+`:save {filename}` - Save as (and change current buffer to {filename})  
+`:w!` - force write (e.g., even if the underlying file has been been changed by another program and this write will overwrite those changes)
+
+These commands can be combined, e.g.  
+`:wq` - write the buffer and quit  
+`:wq!` - force write and quit  
+
+## Basic motion commands move cursor...
+`j` - down  
+`k` - up  
+`h` - left  
+`l` - right  
+
+`0` - Move to beginning of line  
+`^` - Move to first character (non-space or tab) in line (same as "0" if the line starts with a non-space character)  
+`$` - Move to end of line  
+*Note*: `^` and `$` are Regular Expression shortcuts for beginning and end of a string, respectively
+
+`%` - If cursor inside parens (or similar), move to opening paren. If cursor on paren, move to partner paren. If not between parens, do nothing. (Can do weird stuff with unmatched parens.)
+
+`w` - forward one word (alphanumeric or \_; or consective chars that are not those)  
+`e` - end of current word (or next word if currently at end of word)  
+`b` - to beginning of word (or previous word if currently at beginning)  
+`}` - Move forward a paragraph.
+`{` - Move back a paragraph.
+
+`gg` - go to beginning of file  
+`[#]gg` - go to line `[#]` (Example `20gg` goes to line 20)  
+`G` - go to end of file  
+`[#]|` - go to column `[#]` on current line, e.g. `10|` goes to col 10.  
+
+`f<char>` - "find"/put cursor on next instance of `<char>` in line   
+`F<char>` - `f` but backwards search  
+`t` - "to"/ like `f`, but put cursor right before the character  
+`T` - `t` but backwards search  
+`;(,)` - move to next (previous) instance of `<char>` from most recent `f` or `t`
+
+`/<RegEx><Enter>` - next instance of `<RegEx>` (uses full Regular Expression matching)  
+`?` - Same as `/` but reverse search
+`n(N)` - next (previous) instance of recent search  
+`*` - Do `/`" search for word under cursor  
+*Note*: This is basic search functionality. `/gen<Enter>` will go to the next instance of the string "gen", and then `n` will move to the next instance, etc. When you get to the end of the file, it will cycle back to the beginning. Using `?` instead of `/` is just a backwards search.
+
+`c-u` - move cursor Up full page  
+`c-d` - move cursor Down full page  
+*Note*: `c-u` in Vim mappings means `Ctrl+u`  
+
+`c-e` - scroll forward, keeping cursor in place  
+`e-y` - scroll backward, keeping cursor in place  
+
+`c-f` - Forward half-page  
+`c-b` - Back half-page  
+
+`H` - highest line on screen (home)  
+`M` - middle line on screen  
+`L` -  lowest line on screen  
+
+
+**Note:** Most motion commands can take a number before them to execute that number of times.  
+`4j` - move cursor down 4 times  
+`10w` - move forward 10 "words"  
+
+# VISUAL "MODE"
+`v[m]` - Go into visual (highlight) mode to select characters. Use usual motion commands to add to selection as cursor moves.  
+`V[m]` - Visual mode, but grab whole lines at a time, not characters.  
+`c-v[m]` - Visual mode, but select vertically (by columns) instead of horizontally  
+
+`ggvG` - Highlight whole file, i.e., go to beginning of file (`gg`), enter visual mode (`v`), go to end of file (`G`).  
+
+Once a selection has been made, you can use an edit command (see below) on that selection and it will (usually) behave as you'd expect.  
+
+
+# INSERT MODE
+Most commands are executed in Normal Mode. If you actually want to add to the text (type a "j" instead of moving down one line) you need to enter Insert Mode. There are several ways to do this.
+
+`i` - Enter insert mode before the current character  
+`a` - Enter insert mode After the current character  
+`<Esc>` - Exit Insert Mode (go back to Normal Mode).  
+*Note*: Because `<Esc>` is a little out of the way, it's common to remap a more convenient keybinding to also exit Insert Mode. For example, `inoremap 
+jk <Esc>` in your vimrc will allow you to use a quick `jk` instead of `<Esc>`.
+
+`I` - Enter insert mode at the beginning of the current line's text (same as doing `^` then `i`)  
+`A` - Enter insert mode After the end of th current line (like `$` then `a`)  
+`o` - Add a new line after the current line and enter insert mode (like doing `A<Enter>`)  
+`O` - Add a new line before the current line and enter insert mode  
+
+`c[m]` - Change text from here to [m]. "Change" deletes the text and immediately enters insert mode.  
+`cc` - Change this whole line.  
+`C` - Changes from here to end of line.  
+
+`r` - replace the current character with the next character typed (only one character allowed)  
+`R` - Replace characters until \<Esc> (like replace/overwrite mode in Word)  
+
+
+# Edit commands for Normal Mode
+These commands help change text while still in Normal Mode. Many of these commands require a motion command (signified here as [m]) to follow to specify the extent over which to execute the edit. Several common conventions for many (but not all) commands:
+double-tap: execute command for entire line cursor is currently on
+shift + command: execute command from cursor to end of current line
+
+More generally, the composability of editing commands and motion is what makes Vim particularly powerful. If you know 5 editing commands and 5 motion commands, you actually know 25 specific and easy to remember commands.
+
+`[#]d[m]` - delete over [m] (do this [#] times)  
+`dw` - delete from here (location of cursor) to beginning of next word (includes character under the cursor)  
+`d4w` - delete from here to beginning of 4th word forward  
+`dtT` - deletes "to" (up to but not including) the next instance of "T" on this line  
+`df)` - deletes to ("finds") the next instance of ")" on this line  
+
+`dd` - delete this entire line 4dd - delete this line and next 3 (4 total)  
+`D` - delete from here to end of line  
+
+`y[m]` - yank (copy). Same behavior as d (delete).  
+`yw` - yank from here to beginning of next word  
+`y$` - yank from here to end of line  
+*Note*: To make it consistent with `D`, it's common to add a mapping for `Y` in your vimrc, like so: `nnoremap Y y$`
+
+`p` - paste after cursor location (like `a`)  
+`P` - paste before cursor location (like `i`)  
+
+## Registers (for yank and paste).
+`"\<char>y` - yank to register `<char>`.  
+This allows you to have multiple things in your clipboard. Note the Vim clipboard is separate from the OS clipboard. To move between the two (copy/paste between Vim and another program) use the * register, so:
+
+`y$` - yanks to end of line, puts in default register  
+`"a$` - yank to register "a"  
+`"*yG` - yanks to end of file, puts in OS register  
+`p` - pastes what's in the default register (after the cursor, like `a`)  
+`P` - paste before cursor (like command `i`)  
+`"*p` - pastes what's in the OS register (i.e., if you already yanked to * or you did a Ctrl+C copy in another program)
+
+NOTE: deleting text puts that text into the default register, so if you `yy`, move to another line, then `dd`, you'll lose whatever whatever you yanked with `yy`. There is a plugin to override this behavior (I think by Tim Pope).
+
+
+## Change case
+`~` - toggle the case of this character  
+`[#]~` - toggle case of `[#]` next character(s)  
+`g~[m]` - toggle case with motion [m]  
+`gU[m]` - uppercase  
+`gu[m]` - lowercase  
+
+## Indentation
+`>[m]` - indent current line through motion `[m]`  
+`>5j` - indent this and next 5 lines  
+`>G` - indent to end of file  
+`>>` - indent this line (like `dd`, `yy`, etc.)  
+`<[m]` - un-indent (same as indent, but in reverse)  
+
+
+## Misc useful commands
+`J` - Take the next line and move it to the end of this line.
+
+`gq[m]` - Format the text between here and `[m]` (usually just breaks overly long lines to smaller lines, by default 80 characters).  
+`gqq` - Format the current line  
+
+`u` - undo  
+`c-r` - redo  
+
+`.` - repeat last edit (including insert, replace, indent, etc.) **Note: EXTREMELY useful.**  
+`A;;<Esc>j.` - Enter insert mode at end of line (`A`), type two semi-colons (`;;`), exit Insert Mode (`<Esc>`), move down one line (`j`), and add two semi-colons to the end of this new line (`.`)  
+`>>...` - Indent this line `>>`, then indent it another three times (`...`)
+
+
+# Substitution
+`:<range>s/<re>/<str>/<flags>` - substitute first instance of `<re>` in each line in `<range>` with `<str>`. `<flags>` change default behavior.
+
+- `<range>`:
+    - default range is this line only  
+    - `%` - global (whole file)  
+    - `<a>,<b>` - between lines/markers/etc  
+        - `.` - current line  
+        - `$` - last line in file (so `:.,$s` is "from here to end of file")  
+    - *Note*: There are other `<range>` things, most common is just `%`.  
+
+- `<flags>`:
+    - `g` - global/all instances of `<re>` on line (not just first instance on line)  
+    - `c` - confirm (will highlight next instance of `<re>` and ask you to press "y" to execute change  
+    - `i` - case insensitive  
+
+Specific sub: Use `\zs` and `\ze` to demark a sub-RegEx within the matched RegEx that should be substituted. Example: 
+
+`:%s/Year \zs2007\ze is over/2008/g`
+
+This changes all instances of "Year 2007 is over" to "Year 2008 is over", but not all "2007" to "2008".
+
+
+# Advanced motion(ish) commands
+There are "motion" commands that can be used with delete, yank, etc., that can
+be used to target specific text objects.  `dw` will delete from cursor to
+beginning of next word, so will not delete the entire current word under the
+cursor unless the cursor happens to be at the beginning of the word. So `bdw`
+will delete the whole word and the space(s) after it (unless the cursor is
+already at the beginning of the word).
+
+A shortcut around this is these motion-like object commands.
+
+`daw` - Delete "a" "word". Deletes the current word and space(s) after it.  
+`diw` - Delete "inner" "word". Deletes current word but not trailing space(s).  
+`dap` - Delete a paragraph. A "paragraph" to Vim is a group of consecutive lines of text between an empty line(s).  
+`yaw` - Yanks a word.  
+`yiw` - Yanks inner word.  
+`ya(` - Yank a parenthetical. If cursor between (), yank everything between those parens and the parens themselves. Else do Nothing.  
+`yi(` - Yank inner parenthetical. Like `ya(`, but excluding the parens.  
+`ya)` - `ya(`  
+`ya[` - Same as `ya(` but for brackets `[]`.  
+`ya"` - Same  
+
+`da(` - Deletes a parenthetical.  
+`di(` - Deletes within parenthetical.  
+
+`g~i(` - Toggles the case of the inner parenthetical.  
+
+`ciw` - Change inner word  
+`ci[` - Change inner (within) brackets (delete text within brackets and enter Insert Mode).  
+
+
+# Other very useful stuff
+
+## Predictive completion (while in Insert Mode)
+`c-p` - predictive completion (word)  
+`c-x c-l` - predictive completion (line)  
+
+This takes what you've already typed (either word or line) and uses the text in
+the rest of any open buffers to predict what will come next. If there's only
+one possibility, it will be filled in. If there are several possibilities, it
+will give you the choices.
+
+Vim autocomplete is pretty nice, but there are better, automated predictive
+text solutions (specifcally, the package YouCompleteMe). However, I've found
+they're a bit too demanding for most laptops and only useful on desktop
+computers.
+
+## Global command by line
+`:g/<RegEx>/<edit command>` - perform the edit command on every line that matches RegEx  
+`:g!/...` or `:v/...` - the same but for lines that don't match  
+Examples:  
+`:g/DEL THIS/d` deletes every line that contains "DEL THIS"  
+`:g/ $/d` deletes every line that ends with a space.  
+
+## Macros
+
+Hit `q` then some letter, WLOG `a` to begin recording macro "a".  
+Do your thing.  
+Hit `q` to stop recording.  
+`@a` to repeat the new macro. `[#]@a` repeats a `[#]` times.  
+
+
+# Other moderately useful stuff
+
+## Marks
+
+Lower case are local, upper case are global (across files). Jumping to a mark is a standard motion command for deleting, yanking, etc.
+
+`ma` - sets mark on current cursor location (line and column), WLOG, called "a"  
+`'a` - jump to line of "a" (first non-blank character of line)  
+`` `a `` - jump to position of "a" (line and col)  
+`:marks` - lists all current marks  
+`:delmarks <args>` - delete specific marks  
+`:delmarks!` - delete all lowercase in buffer  
+`]'`, `['` - jump to next (previous) line with a lowercase mark  
+`` ]` ``, `` [` `` - jump to next (previous) lowercase mark  
+
+### Special Marks (Most useful when beginning)
+`'` - The line you were on before making a "jump". So if you're on line 57 and
+jump to beginning of file using `gg`, hitting `''` will take you right back to
+line 57.  
+`.` - last edit in current buffer  
+``` `` ``` - jump back to position (line and col) where just jumped from  
+`` `[ ``, `` `] `` - jump to beg/end of last changed or yanked text  
+
+## Spellcheck
+
+Turn on with `:set spell`, turn off with `:set nospell`.
+
+`z=` - Suggest correctly spelled words  
+`]s`, `[s` - Move to next/previous mispelled word (use `S` for "bad words only")  
+`zq` - Add word under cursor as good word to first name in 'spellfile'  
+`zw` - Mark as bad word  
+`zu[q,w]` - Undo marking  
